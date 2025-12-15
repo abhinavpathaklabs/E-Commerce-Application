@@ -16,7 +16,7 @@ FROM node:18-alpine AS runner
 
 WORKDIR /app
 
-COPY --from=builder /app/standalone ./standalone
+COPY --from=builder /app/.next/standalone ./.next/standalone
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
