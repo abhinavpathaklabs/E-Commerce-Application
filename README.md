@@ -144,7 +144,7 @@ aws configure
 ```
 
 ```bash
-aws eks --region eu-west-1 update-kubeconfig --name tws-eks-cluster
+aws eks --region eu-west-1 update-kubeconfig --name E-Commerce-Application
 ```
 9. **Check your cluster:**
 ```bash
