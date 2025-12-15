@@ -32,8 +32,8 @@ module "eks" {
       max_size = 5
       desired_size = 2
       capacity_type = "SPOT"
-      instance_types = ["t3.small"]
-      disk_size = 20
+      instance_types = ["t3.micro"]
+      disk_size = 30
       use_custom_launch_template = false
 
     }
@@ -41,7 +41,7 @@ module "eks" {
       Name = "ecommerce-demo-ng"
       ExtraTag = "e-commerce-app"
       Environment = "dev"
-    }   
+    }
 
   }
 
