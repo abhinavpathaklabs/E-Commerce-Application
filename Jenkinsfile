@@ -24,11 +24,16 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 script {
-                    checkoutRepo("https://github.com/LondheShubham153/tws-e-commerce-app.git","master")
-                }
+                    dir('source') {
+                    checkout([$class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/abhinavpathaklabs/E-Commerce-Application.git']]
+                    ])
+                    }   
+                 }
             }
         }
-        
+
         stage('Build Docker Images') {
             parallel {
                 stage('Build Main App Image') {
