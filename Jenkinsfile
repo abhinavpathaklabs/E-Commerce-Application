@@ -1,17 +1,17 @@
-@Library('Shared')
+@Library('Shared') _
 
 pipeline {
-
     agent any
-
+    
     environment {
-       DOCKER_IMAGE_NAME = 'devop715/ecommerce-demo-app'
-       DOCKER_MIGRATION_IMAGE_NAME = 'devop715/ecommerce-demo-migration'
-       DOCKER_IMAGE_TAG = "${BUILD_NUMBER}"
-       DOCKER_CREDENTIALS= credentials('github-credentials')
-       GIT_BRANCH = 'master'
+        // Update the main app image name to match the deployment file
+        DOCKER_IMAGE_NAME = 'trainwithshubham/easyshop-app'
+        DOCKER_MIGRATION_IMAGE_NAME = 'trainwithshubham/easyshop-migration'
+        DOCKER_IMAGE_TAG = "${BUILD_NUMBER}"
+        GITHUB_CREDENTIALS = credentials('github-credentials')
+        GIT_BRANCH = "master"
     }
-
+    
     stages {
         stage('Cleanup Workspace') {
             steps {
@@ -20,16 +20,15 @@ pipeline {
                 }
             }
         }
-
+        
         stage('Clone Repository') {
             steps {
                 script {
-                    clone("https://github.com/abhinavpathaklabs/E-Commerce-Application.git","master")
-                    }
+                    clone("https://github.com/LondheShubham153/tws-e-commerce-app.git","master")
                 }
             }
         }
-
+        
         stage('Build Docker Images') {
             parallel {
                 stage('Build Main App Image') {
@@ -44,6 +43,7 @@ pipeline {
                         }
                     }
                 }
+                
                 stage('Build Migration Image') {
                     steps {
                         script {
@@ -58,16 +58,15 @@ pipeline {
                 }
             }
         }
-
+        
         stage('Run Unit Tests') {
             steps {
                 script {
                     run_tests()
-                    // Add your unit test commands here
                 }
             }
         }
-
+        
         stage('Security Scan with Trivy') {
             steps {
                 script {
@@ -78,8 +77,8 @@ pipeline {
                 }
             }
         }
-
-        stage('Push Docker Images to Docker Hub') {
+        
+        stage('Push Docker Images') {
             parallel {
                 stage('Push Main App Image') {
                     steps {
@@ -92,6 +91,7 @@ pipeline {
                         }
                     }
                 }
+                
                 stage('Push Migration Image') {
                     steps {
                         script {
@@ -103,10 +103,10 @@ pipeline {
                         }
                     }
                 }
-
             }
         }
-
+        
+        // Add this new stage
         stage('Update Kubernetes Manifests') {
             steps {
                 script {
@@ -115,7 +115,7 @@ pipeline {
                         manifestsPath: 'kubernetes',
                         gitCredentials: 'github-credentials',
                         gitUserName: 'Jenkins CI',
-                        gitUserEmail: 'masteringdevops74@gmail.com'
+                        gitUserEmail: 'shubhamnath5@gmail.com'
                     )
                 }
             }
