@@ -84,9 +84,28 @@ pipeline {
         }
 
         stage('Security Scan with Trivy') {
-            steps {
-                script {
-                    trivyScan()
+            parallel {
+
+                stage('Scan Main App Image') {
+                    steps {
+                        script {
+                            trivyScan(
+                                imageName: env.DOCKER_IMAGE_NAME,
+                                imageTag: env.DOCKER_IMAGE_TAG
+                            )
+                        }
+                    }
+                }
+
+                stage('Scan Migration Image') {
+                    steps {
+                        script {
+                            trivyScan(
+                                imageName: env.DOCKER_MIGRATION_IMAGE_NAME,
+                                imageTag: env.DOCKER_IMAGE_TAG
+                            )
+                        }
+                    }
                 }
             }
         }
