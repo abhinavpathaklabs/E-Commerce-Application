@@ -56,19 +56,19 @@ pipeline {
                         }
                     }
                 }
-            }
 
-            stage('Build Migration Image') {
-                steps {
-                    script {
-                        dir('source') {
-                            echo "Building Docker image: devop715/easyshop-migration:${BUILD_NUMBER} using scripts/Dockerfile.migration"
-                            sh """
-                                docker build \\
-                                    -t devop715/easyshop-migration:${BUILD_NUMBER} \\
-                                    -t devop715/easyshop-migration:latest \\
-                                    -f scripts/Dockerfile.migration .
-                            """
+                stage('Build Migration Image') {
+                    steps {
+                        script {
+                            dir('source') {
+                                echo "Building Docker image: devop715/easyshop-migration:${BUILD_NUMBER} using scripts/Dockerfile.migration"
+                                sh """
+                                    docker build \\
+                                        -t devop715/easyshop-migration:${BUILD_NUMBER} \\
+                                        -t devop715/easyshop-migration:latest \\
+                                        -f scripts/Dockerfile.migration .
+                                """
+                            }
                         }
                     }
                 }
