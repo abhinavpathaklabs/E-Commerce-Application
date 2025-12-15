@@ -39,7 +39,7 @@ pipeline {
                 stage('Build Main App Image') {
                     steps {
                         script {
-                            docker_build(
+                            buildDockerImage(
                                 imageName: env.DOCKER_IMAGE_NAME,
                                 imageTag: env.DOCKER_IMAGE_TAG,
                                 dockerfile: 'Dockerfile',
