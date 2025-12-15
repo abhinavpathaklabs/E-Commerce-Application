@@ -32,7 +32,7 @@ module "eks" {
       max_size = 5
       desired_size = 2
       capacity_type = "SPOT"
-      instance_types = ["m7i-flex.large"]
+      instance_types = ["t3.small"]
       disk_size = 20
       use_custom_launch_template = false
 
@@ -41,7 +41,7 @@ module "eks" {
       Name = "ecommerce-demo-ng"
       ExtraTag = "e-commerce-app"
       Environment = "dev"
-    }
+    }   
 
   }
 
@@ -51,7 +51,7 @@ module "eks" {
 
 data "aws_instances" "eks_nodes" {
     instance_tags = {
-        "kubernetes.io/cluster/${module.eks.cluster_id}" = "owned"
+        "eks:cluster-name" = module.eks.cluster_name
     }   
 
     filter {
