@@ -78,7 +78,7 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 script {
-                    run_tests()
+                    runUnitTests()
                 }
             }
         }
