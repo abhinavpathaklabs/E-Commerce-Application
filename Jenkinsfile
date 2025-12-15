@@ -2,17 +2,18 @@
 
 pipeline {
     agent any
-    
+
     environment {
         // Update the main app image name to match the deployment file
-        DOCKER_IMAGE_NAME = 'devop715/easyshop-app'
+        DOCKER_IMAGE_NAME           = 'devop715/easyshop-app'
         DOCKER_MIGRATION_IMAGE_NAME = 'devop715/easyshop-migration'
-        DOCKER_IMAGE_TAG = "${BUILD_NUMBER}"
-        GITHUB_CREDENTIALS = credentials('github-credentials')
-        GIT_BRANCH = "main"
+        DOCKER_IMAGE_TAG            = "${BUILD_NUMBER}"
+        GITHUB_CREDENTIALS          = credentials('github-credentials')
+        GIT_BRANCH                  = "main"
     }
-    
+
     stages {
+
         stage('Cleanup Workspace') {
             steps {
                 script {
@@ -20,50 +21,60 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Clone Repository') {
             steps {
                 script {
                     dir('source') {
-                    checkout([$class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    userRemoteConfigs: [[url: 'https://github.com/abhinavpathaklabs/E-Commerce-Application.git']]
-                    ])
-                    }   
-                 }
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: '*/main']],
+                            userRemoteConfigs: [[
+                                url: 'https://github.com/abhinavpathaklabs/E-Commerce-Application.git'
+                            ]]
+                        ])
+                    }
+                }
             }
         }
 
         stage('Build Docker Images') {
             parallel {
+
                 stage('Build Main App Image') {
                     steps {
                         script {
-                            buildDockerImage(
-                                imageName: env.DOCKER_IMAGE_NAME,
-                                imageTag: env.DOCKER_IMAGE_TAG,
-                                dockerfile: 'Dockerfile',
-                                context: '.'
-                            )
+                            dir('source') {
+                                echo "Building Docker image: devop715/easyshop-app:${BUILD_NUMBER} using Dockerfile"
+                                sh """
+                                    docker build \\
+                                        -t devop715/easyshop-app:${BUILD_NUMBER} \\
+                                        -t devop715/easyshop-app:latest \\
+                                        -f Dockerfile .
+                                """
+                            }
                         }
                     }
                 }
-                
-                stage('Build Migration Image') {
-                    steps {
-                        script {
-                            buildDockerImage(
-                                imageName: env.DOCKER_MIGRATION_IMAGE_NAME,
-                                imageTag: env.DOCKER_IMAGE_TAG,
-                                dockerfile: 'scripts/Dockerfile.migration',
-                                context: '.'
-                            )
+            }
+
+            stage('Build Migration Image') {
+                steps {
+                    script {
+                        dir('source') {
+                            echo "Building Docker image: devop715/easyshop-migration:${BUILD_NUMBER} using scripts/Dockerfile.migration"
+                            sh """
+                                docker build \\
+                                    -t devop715/easyshop-migration:${BUILD_NUMBER} \\
+                                    -t devop715/easyshop-migration:latest \\
+                                    -f scripts/Dockerfile.migration .
+                            """
                         }
                     }
                 }
             }
         }
-        
+
         stage('Run Unit Tests') {
             steps {
                 script {
@@ -71,20 +82,18 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Security Scan with Trivy') {
             steps {
                 script {
-                    // Create directory for results
-                  
                     trivy_scan()
-                    
                 }
             }
         }
-        
+
         stage('Push Docker Images') {
             parallel {
+
                 stage('Push Main App Image') {
                     steps {
                         script {
@@ -96,7 +105,7 @@ pipeline {
                         }
                     }
                 }
-                
+
                 stage('Push Migration Image') {
                     steps {
                         script {
@@ -110,8 +119,7 @@ pipeline {
                 }
             }
         }
-        
-        // Add this new stage
+
         stage('Update Kubernetes Manifests') {
             steps {
                 script {
