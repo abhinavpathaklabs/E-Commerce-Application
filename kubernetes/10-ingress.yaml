@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: easyshop-ingress
+  namespace: easyshop
+spec:
+  rules:
+    - host: easyshop.letsdeployit.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: easyshop-service
+                port:
+                  number: 80
+  tls:
+    - hosts:
+      - easyshop.letsdeployit.com
+      secretName: easyshop-tls
